@@ -1,11 +1,16 @@
 {
   "name": "staruml-typescript",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "homepage": "https://github.com/yeoupooh/staruml-typescript",
+  "keywords": ["javascript", "staruml", "TypeScript", "ts", "UML"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Thomas Min",
+  "author": {
+    "name": "Thomas Min",
+    "url": "https://github.com/yeoupooh"
+  },
   "license": "GPLv3"
 }
