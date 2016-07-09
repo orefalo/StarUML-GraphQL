@@ -8,25 +8,57 @@ define(function(require, exports, module) {
 
     var Commands = app.getModule('command/Commands'),
         CommandManager = app.getModule("command/CommandManager"),
-        MenuManager = app.getModule("menu/MenuManager");
-    // var ElementPickerDialog = app.getModule("dialogs/ElementPickerDialog");
-    // var FileSystem = app.getModule("filesystem/FileSystem");
-    // var Dialogs = app.getModule("dialogs/Dialogs");
+        MenuManager = app.getModule("menu/MenuManager"),
+        //  ElementPickerDialog = app.getModule("dialogs/ElementPickerDialog"),
+        FileSystem = app.getModule("filesystem/FileSystem"),
+        Dialogs = app.getModule("dialogs/Dialogs"),
 
-    // var JSGen = require("JSCodeGenerator");
-    var TypeScriptConfigure = require("TypeScriptConfigure");
+        // JSGen = require("JSCodeGenerator"),
+        TypeScriptConfigure = require("TypeScriptConfigure");
 
-    var OUTER_CMD = "tools.typescript";
-    var CMD_GENERATE = "tools.typescript.generate";
-    var CMD_ABOUT = "tools.typescript.about";
-    var CMD_CONFIG = "tools.typescript.configure";
+    var OUTER_CMD = "tools.typescript",
+        CMD_GENERATE = "tools.typescript.generate",
+        CMD_ABOUT = "tools.typescript.about",
+        CMD_CONFIG = "tools.typescript.configure";
+
+    function generateTypeScript(base, path, opts) {
+        var result = new $.Deferred();
+        console.log('base', base);
+        console.log('path', path);
+        console.log('opts', opts);
+        // TODO generate ts code here
+        return result.resolve();
+    }
 
     function handleGenerate(base, path, opts) {
-        // var result = new $.Deferred();
+        var result = new $.Deferred();
         opts = TypeScriptConfigure.getGenOptions();
-        console.log(opts);
-        window.alert("generated type script");
+        console.log('base', base);
+        console.log('path', path);
+        console.log('opts', opts);
+        // window.alert("generated type script");
+
+        if (!path) {
+            FileSystem.showOpenDialog(false, true, "Select a folder where generated codes to be located", null, null,
+                function(err, files) {
+                    if (!err) {
+                        if (files.length > 0) {
+                            path = files[0];
+                            console.log('selected path', path);
+                            generateTypeScript(base, path, opts).then(result.resolve, result.reject);
+                        } else {
+                            result.reject(FileSystem.USER_CANCELED);
+                        }
+                    } else {
+                        result.reject(err);
+                    }
+                }
+            );
+        } else {
+            generateTypeScript(base, path, opts).then(result.resolve, result.reject);
+        }
     }
+    /// handleGenerate
 
     function handleConfigure() {
         CommandManager.execute(Commands.FILE_PREFERENCES, TypeScriptConfigure.getId());
