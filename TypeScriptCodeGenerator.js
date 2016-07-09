@@ -61,8 +61,8 @@ define(function(require, exports, module) {
             fullPath,
             directory,
             codeWriter,
-            file;
-        // var isAnnotationType = elem.stereotype === "annotationType";
+            file,
+            isAnnotationType = (elem.stereotype !== undefined && elem.stereotype === "annotationType");
 
         console.log('generate', 'elem', elem);
 
@@ -87,70 +87,70 @@ define(function(require, exports, module) {
         } else if (elem instanceof type.UMLClass) {
 
             // AnnotationType
-            // if (isAnnotationType) {
-                // console.log('annotationType generate');
-                //
-                // console.log(elem.name.substring(elem.name.length - 9, elem.name.length));
-                //
-                // if (elem.name.length < 9) {
-                //     elem.name = elem.name + "Attribute";
-                // } else if (elem.name.substring(elem.name.length - 9, elem.name.length) !== "Attribute") {
-                //     elem.name = elem.name + "Attribute";
-                // }
-                //
-                // fullPath = path + "/" + elem.name + ".cs";
-                // codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-                // codeWriter.writeLine();
+            if (isAnnotationType) {
+                console.log('annotationType generate');
+
+                console.log(elem.name.substring(elem.name.length - 9, elem.name.length));
+
+                if (elem.name.length < 9) {
+                    elem.name = elem.name + "Attribute";
+                } else if (elem.name.substring(elem.name.length - 9, elem.name.length) !== "Attribute") {
+                    elem.name = elem.name + "Attribute";
+                }
+
+                fullPath = path + "/" + elem.name + ".ts";
+                codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
+                codeWriter.writeLine();
                 // codeWriter.writeLine("using System;");
                 // codeWriter.writeLine("using System.Collections.Generic;");
                 // codeWriter.writeLine("using System.Linq;");
                 // codeWriter.writeLine("using System.Text;");
                 // codeWriter.writeLine();
-                // //                this.writeAnnotationType(codeWriter, elem, options, isAnnotationType);
+                this.writeAnnotationType(codeWriter, elem, options, isAnnotationType);
                 // this.writeNamespace("writeAnnotationType", codeWriter, elem, options, isAnnotationType);
-                // file = FileSystem.getFileForPath(fullPath);
-                // FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
-            // } else {
+                file = FileSystem.getFileForPath(fullPath);
+                FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
+            } else {
                 // Class
-                fullPath = path + "/" + elem.name + ".cs";
+                fullPath = path + "/" + elem.name + ".ts";
                 console.log('Class generate' + fullPath);
 
                 codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
                 codeWriter.writeLine();
-                codeWriter.writeLine("using System;");
-                codeWriter.writeLine("using System.Collections.Generic;");
-                codeWriter.writeLine("using System.Linq;");
-                codeWriter.writeLine("using System.Text;");
-                codeWriter.writeLine();
-                //                this.writeClass(codeWriter, elem, options, isAnnotationType);
+                // codeWriter.writeLine("using System;");
+                // codeWriter.writeLine("using System.Collections.Generic;");
+                // codeWriter.writeLine("using System.Linq;");
+                // codeWriter.writeLine("using System.Text;");
+                // codeWriter.writeLine();
+                this.writeClass(codeWriter, elem, options, isAnnotationType);
                 // this.writeNamespace("writeClass", codeWriter, elem, options, isAnnotationType);
                 file = FileSystem.getFileForPath(fullPath);
                 FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
-            // }
+            }
         } else if (elem instanceof type.UMLInterface) {
             // Interface
-            fullPath = path + "/" + elem.name + ".cs";
+            fullPath = path + "/" + elem.name + ".ts";
             console.log('Interface generate' + fullPath);
 
             codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
             codeWriter.writeLine();
-            codeWriter.writeLine("using System;");
-            codeWriter.writeLine("using System.Collections.Generic;");
-            codeWriter.writeLine("using System.Linq;");
-            codeWriter.writeLine("using System.Text;");
-            codeWriter.writeLine();
-            //            this.writeInterface(codeWriter, elem, options);
+            // codeWriter.writeLine("using System;");
+            // codeWriter.writeLine("using System.Collections.Generic;");
+            // codeWriter.writeLine("using System.Linq;");
+            // codeWriter.writeLine("using System.Text;");
+            // codeWriter.writeLine();
+            this.writeInterface(codeWriter, elem, options);
             // this.writeNamespace("writeInterface", codeWriter, elem, options, isAnnotationType);
             file = FileSystem.getFileForPath(fullPath);
             FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
 
         } else if (elem instanceof type.UMLEnumeration) {
             // Enum
-            fullPath = path + "/" + elem.name + ".cs";
+            fullPath = path + "/" + elem.name + ".ts";
             codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
             codeWriter.writeLine();
-            //            this.writeEnum(codeWriter, elem, options);
-            // this.writeNamespace("writeEnum", codeWriter, elem, options, isAnnotationType);
+            this.writeEnum(codeWriter, elem, options);
+            this.writeNamespace("writeEnum", codeWriter, elem, options, isAnnotationType);
             file = FileSystem.getFileForPath(fullPath);
             FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
 
@@ -228,11 +228,7 @@ define(function(require, exports, module) {
 
         codeWriter.outdent();
         codeWriter.writeLine("}");
-
-
     };
-
-
 
     /**
      * Write Interface
@@ -241,18 +237,16 @@ define(function(require, exports, module) {
      * @param {Object} options
      */
     TypeScriptCodeGenerator.prototype.writeInterface = function(codeWriter, elem, options) {
-
-
         var i, len, terms = [];
 
         // Doc
         this.writeDoc(codeWriter, elem.documentation, options);
 
         // Modifiers
-        var visibility = this.getVisibility(elem);
-        if (visibility) {
-            terms.push(visibility);
-        }
+        // var visibility = this.getVisibility(elem);
+        // if (visibility) {
+        //     terms.push(visibility);
+        // }
 
         // Interface
         terms.push("interface");
@@ -261,7 +255,7 @@ define(function(require, exports, module) {
         // Extends
         var _extends = this.getSuperClasses(elem);
         if (_extends.length > 0) {
-            terms.push(": " + _.map(_extends, function(e) {
+            terms.push("extends " + _.map(_extends, function(e) {
                 return e.name;
             }).join(", "));
         }
@@ -273,7 +267,7 @@ define(function(require, exports, module) {
         // (from attributes)
         for (i = 0, len = elem.attributes.length; i < len; i++) {
             this.writeMemberVariable(codeWriter, elem.attributes[i], options);
-            codeWriter.writeLine();
+            // codeWriter.writeLine();
         }
         // (from associations)
         var associations = Repository.getRelationshipsOf(elem, function(rel) {
@@ -283,10 +277,10 @@ define(function(require, exports, module) {
             var asso = associations[i];
             if (asso.end1.reference === elem && asso.end2.navigable === true) {
                 this.writeMemberVariable(codeWriter, asso.end2, options);
-                codeWriter.writeLine();
+                // codeWriter.writeLine();
             } else if (asso.end2.reference === elem && asso.end1.navigable === true) {
                 this.writeMemberVariable(codeWriter, asso.end1, options);
-                codeWriter.writeLine();
+                // codeWriter.writeLine();
             }
         }
 
@@ -329,9 +323,6 @@ define(function(require, exports, module) {
      * @param {Object} options
      */
     TypeScriptCodeGenerator.prototype.writeAnnotationType = function(codeWriter, elem, options) {
-
-
-
         var i, len, terms = [];
         // Doc
         var doc = elem.documentation.trim();
@@ -356,24 +347,28 @@ define(function(require, exports, module) {
         terms.push(elem.name);
 
         // AnnotationType => Attribute in C#
-        terms.push(":System.Attribute");
+        // terms.push(":System.Attribute");
 
 
-        //        // Extends
-        //        var _extends = this.getSuperClasses(elem);
-        //        if (_extends.length > 0) {
-        //            terms.push(": " + _extends[0].name);
-        //        }
-        //
-        //        // Implements
-        //        var _implements = this.getSuperInterfaces(elem);
-        //        if (_implements.length > 0) {
-        //            if (_extends.length > 0) {
-        //                terms.push(", " + _.map(_implements, function (e) { return e.name; }).join(", "));
-        //            } else {
-        //                terms.push(": " + _.map(_implements, function (e) { return e.name; }).join(", "));
-        //            }
-        //        }
+        // Extends
+        var _extends = this.getSuperClasses(elem);
+        if (_extends.length > 0) {
+            terms.push(": " + _extends[0].name);
+        }
+
+        // Implements
+        var _implements = this.getSuperInterfaces(elem);
+        if (_implements.length > 0) {
+            if (_extends.length > 0) {
+                terms.push(", " + _.map(_implements, function(e) {
+                    return e.name;
+                }).join(", "));
+            } else {
+                terms.push("implements " + _.map(_implements, function(e) {
+                    return e.name;
+                }).join(", "));
+            }
+        }
 
         codeWriter.writeLine(terms.join(" ") + " {");
         codeWriter.writeLine();
@@ -387,7 +382,7 @@ define(function(require, exports, module) {
         // (from attributes)
         for (i = 0, len = elem.attributes.length; i < len; i++) {
             this.writeMemberVariable(codeWriter, elem.attributes[i], options);
-            codeWriter.writeLine();
+            // codeWriter.writeLine();
         }
         // (from associations)
         var associations = Repository.getRelationshipsOf(elem, function(rel) {
@@ -400,11 +395,11 @@ define(function(require, exports, module) {
             var asso = associations[i];
             if (asso.end1.reference === elem && asso.end2.navigable === true) {
                 this.writeMemberVariable(codeWriter, asso.end2, options);
-                codeWriter.writeLine();
+                // codeWriter.writeLine();
                 console.log('assoc end1');
             } else if (asso.end2.reference === elem && asso.end1.navigable === true) {
                 this.writeMemberVariable(codeWriter, asso.end1, options);
-                codeWriter.writeLine();
+                // codeWriter.writeLine();
                 console.log('assoc end2');
             }
         }
@@ -449,8 +444,6 @@ define(function(require, exports, module) {
      * @param {Object} options
      */
     TypeScriptCodeGenerator.prototype.writeClass = function(codeWriter, elem, options) {
-
-
         var i, len, terms = [];
 
         // Doc
@@ -461,15 +454,15 @@ define(function(require, exports, module) {
         this.writeDoc(codeWriter, doc, options);
 
         // Modifiers
-        var _modifiers = this.getModifiers(elem);
-        if (_.some(elem.operations, function(op) {
-                return op.isAbstract === true;
-            })) {
-            _modifiers.push("abstract");
-        }
-        if (_modifiers.length > 0) {
-            terms.push(_modifiers.join(" "));
-        }
+        // var _modifiers = this.getModifiers(elem);
+        // if (_.some(elem.operations, function(op) {
+        //         return op.isAbstract === true;
+        //     })) {
+        //     _modifiers.push("abstract");
+        // }
+        // if (_modifiers.length > 0) {
+        //     terms.push(_modifiers.join(" "));
+        // }
 
         // Class
         terms.push("class");
@@ -478,7 +471,7 @@ define(function(require, exports, module) {
         // Extends
         var _extends = this.getSuperClasses(elem);
         if (_extends.length > 0) {
-            terms.push(": " + _extends[0].name);
+            terms.push("extends " + _extends[0].name);
         }
 
         // Implements
@@ -489,7 +482,7 @@ define(function(require, exports, module) {
                     return e.name;
                 }).join(", "));
             } else {
-                terms.push(": " + _.map(_implements, function(e) {
+                terms.push("implements " + _.map(_implements, function(e) {
                     return e.name;
                 }).join(", "));
             }
@@ -507,7 +500,7 @@ define(function(require, exports, module) {
         // (from attributes)
         for (i = 0, len = elem.attributes.length; i < len; i++) {
             this.writeMemberVariable(codeWriter, elem.attributes[i], options);
-            codeWriter.writeLine();
+            // codeWriter.writeLine();
         }
         // (from associations)
         var associations = Repository.getRelationshipsOf(elem, function(rel) {
@@ -520,11 +513,11 @@ define(function(require, exports, module) {
             var asso = associations[i];
             if (asso.end1.reference === elem && asso.end2.navigable === true) {
                 this.writeMemberVariable(codeWriter, asso.end2, options);
-                codeWriter.writeLine();
+                // codeWriter.writeLine();
                 console.log('assoc end1');
             } else if (asso.end2.reference === elem && asso.end1.navigable === true) {
                 this.writeMemberVariable(codeWriter, asso.end1, options);
-                codeWriter.writeLine();
+                // codeWriter.writeLine();
                 console.log('assoc end2');
             }
         }
@@ -555,13 +548,9 @@ define(function(require, exports, module) {
             }
         }
 
-
         codeWriter.outdent();
         codeWriter.writeLine("}");
-
-
     };
-
 
     /**
      * Write Method
@@ -588,16 +577,11 @@ define(function(require, exports, module) {
             this.writeDoc(codeWriter, doc, options);
 
             // modifiers
-            var _modifiers = this.getModifiers(elem);
-            if (_modifiers.length > 0) {
-                terms.push(_modifiers.join(" "));
-            }
-
-            // type
-            if (returnParam) {
-                terms.push(this.getType(returnParam));
-            } else {
-                terms.push("void");
+            if (!elem._parent instanceof type.UMLInterface) {
+                var _modifiers = this.getModifiers(elem);
+                if (_modifiers.length > 0) {
+                    terms.push(_modifiers.join(" "));
+                }
             }
 
             // name + parameters
@@ -606,14 +590,22 @@ define(function(require, exports, module) {
                 var i, len;
                 for (i = 0, len = params.length; i < len; i++) {
                     var p = params[i];
-                    var s = this.getType(p) + " " + p.name;
-                    if (p.isReadOnly === true) {
-                        s = "sealed " + s;
-                    }
+                    var s = p.name + ": " + this.getType(p);
+                    // if (p.isReadOnly === true) {
+                    //     s = "sealed " + s;
+                    // }
                     paramTerms.push(s);
                 }
             }
             terms.push(elem.name + "(" + paramTerms.join(", ") + ")");
+
+            // type
+            terms.push(": ");
+            if (returnParam) {
+                terms.push(this.getType(returnParam));
+            } else {
+                terms.push("void");
+            }
 
             // body
             if (skipBody === true || _.contains(_modifiers, "abstract")) {
@@ -710,20 +702,27 @@ define(function(require, exports, module) {
             var terms = [];
             // doc
             this.writeDoc(codeWriter, elem.documentation, options);
+
             // modifiers
-            var _modifiers = this.getModifiers(elem);
-            if (_modifiers.length > 0) {
-                terms.push(_modifiers.join(" "));
+            console.log('writemember', 'elem', elem, elem._parent instanceof type.UMLInterface);
+            if (!elem._parent instanceof type.UMLInterface) {
+                var _modifiers = this.getModifiers(elem);
+                if (_modifiers.length > 0) {
+                    terms.push(_modifiers.join(" "));
+                }
             }
-            // type
-            terms.push(this.getType(elem));
             // name
             terms.push(elem.name);
+            terms.push(": ");
+
+            // type
+            terms.push(this.getType(elem));
+
             // initial value
             if (elem.defaultValue && elem.defaultValue.length > 0) {
                 terms.push("= " + elem.defaultValue);
             }
-            codeWriter.writeLine(terms.join(" ") + ";");
+            codeWriter.writeLine(terms.join("") + ";");
         }
     };
 
@@ -744,7 +743,8 @@ define(function(require, exports, module) {
             if (visibility) {
                 terms.push(visibility);
             }
-            terms.push(elem.name + "()");
+            // terms.push(elem.name + "()");
+            terms.push("constructor()");
             codeWriter.writeLine(terms.join(" ") + " {");
             codeWriter.writeLine("}");
         }
