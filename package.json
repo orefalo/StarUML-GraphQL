@@ -5,7 +5,7 @@
     "description": "TypeScript code generation",
     "homepage": "https://github.com/yeoupooh/staruml-typescript",
     "issues": "https://github.com/yeoupooh/staruml-typescript/issues",
-    "keywords": ["staruml", "TypeScript", "ts", "UML"],
+    "keywords": ["TypeScript", "ts", "UML", "staruml"],
     "author": {
         "name": "Thomas Min",
         "email": "thomas.min.2012@gmail.com",
