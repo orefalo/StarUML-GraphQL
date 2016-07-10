@@ -14,6 +14,13 @@ define(function(require, exports, module) {
             type: "Section"
         },
 
+        "typescript.gen.tsDoc": {
+            text: "TypeScript Doc",
+            description: "Generate TypeScript Doc comments.",
+            type: "Check",
+            default: true
+        },
+
         "typescript.gen.copyright": {
             text: "Copyright Text",
             description: "Copyright Text to use on all files",
@@ -43,6 +50,7 @@ define(function(require, exports, module) {
 
     function getGenOptions() {
         return {
+            tsDoc: PreferenceManager.get("typescript.gen.tsDoc"),
             indentSpaces: PreferenceManager.get("typescript.gen.indentSpaces"),
             copyright: PreferenceManager.get("typescript.gen.copyright"),
             comments: PreferenceManager.get("typescript.gen.comments")

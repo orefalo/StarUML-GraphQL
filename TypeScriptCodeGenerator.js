@@ -1,5 +1,5 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, regexp: true */
-/*global define, $, _, window, app, type, document, csharp */
+/*global define, $, _, window, app, type, document */
 
 define(function(require, exports, module) {
     "use strict";
@@ -711,6 +711,7 @@ define(function(require, exports, module) {
                     terms.push(_modifiers.join(" "));
                 }
             }
+
             // name
             terms.push(elem.name);
             terms.push(": ");
@@ -726,7 +727,6 @@ define(function(require, exports, module) {
         }
     };
 
-
     /**
      * Write Constructor
      * @param {StringWriter} codeWriter
@@ -738,12 +738,12 @@ define(function(require, exports, module) {
             var terms = [];
             // Doc
             this.writeDoc(codeWriter, elem.documentation, options);
+
             // Visibility
             var visibility = this.getVisibility(elem);
             if (visibility) {
                 terms.push(visibility);
             }
-            // terms.push(elem.name + "()");
             terms.push("constructor()");
             codeWriter.writeLine(terms.join(" ") + " {");
             codeWriter.writeLine("}");
@@ -757,17 +757,16 @@ define(function(require, exports, module) {
      * @param {Object} options
      */
     TypeScriptCodeGenerator.prototype.writeDoc = function(codeWriter, text, options) {
-        // TODO unimplemented
-        // var i, len, lines;
-        // if (options.csharpDoc && _.isString(text)) {
-        //     console.log("write Doc");
-        //     lines = text.trim().split("\n");
-        //     codeWriter.writeLine("/**");
-        //     for (i = 0, len = lines.length; i < len; i++) {
-        //         codeWriter.writeLine(" * " + lines[i]);
-        //     }
-        //     codeWriter.writeLine(" */");
-        // }
+        var i, len, lines;
+        if (options.tsDoc && _.isString(text)) {
+            console.log("write Doc");
+            lines = text.trim().split("\n");
+            codeWriter.writeLine("/**");
+            for (i = 0, len = lines.length; i < len; i++) {
+                codeWriter.writeLine(" * " + lines[i]);
+            }
+            codeWriter.writeLine(" */");
+        }
     };
 
     /**

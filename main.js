@@ -51,6 +51,7 @@ define(function(require, exports, module) {
             generateTypeScript(base, path, options).then(result.resolve, result.reject);
         }
     }
+    /// openFolder
 
     function handleGenerate(base, path, options) {
         var result = new $.Deferred();
@@ -67,51 +68,13 @@ define(function(require, exports, module) {
                     console.log('ElementPickerDialog', buttonId, selected);
                     if (buttonId === Dialogs.DIALOG_BTN_OK && selected) {
                         base = selected;
-
                         openFolder(base, path, options, result);
-                        // // If path is not assigned, popup Open Dialog to select a folder
-                        // if (!path) {
-                        //     FileSystem.showOpenDialog(false, true, "Select a folder where generated codes to be located", null, null, function(err, files) {
-                        //         if (!err) {
-                        //             if (files.length > 0) {
-                        //                 path = files[0];
-                        //                 generateTypeScript(base, path, options).then(result.resolve, result.reject);
-                        //             } else {
-                        //                 result.reject(FileSystem.USER_CANCELED);
-                        //             }
-                        //         } else {
-                        //             result.reject(err);
-                        //         }
-                        //     });
-                        // } else {
-                        //     generateTypeScript(base, path, options).then(result.resolve, result.reject);
-                        // }
                     } else {
                         result.reject();
                     }
                 });
         } else {
           openFolder(base, path, options);
-            // // If path is not assigned, popup Open Dialog to select a folder
-            // if (!path) {
-            //     FileSystem.showOpenDialog(false, true, "Select a folder where generated codes to be located", null, null,
-            //         function(err, files) {
-            //             if (!err) {
-            //                 if (files.length > 0) {
-            //                     path = files[0];
-            //                     console.log('selected path', path);
-            //                     generateTypeScript(base, path, options).then(result.resolve, result.reject);
-            //                 } else {
-            //                     result.reject(FileSystem.USER_CANCELED);
-            //                 }
-            //             } else {
-            //                 result.reject(err);
-            //             }
-            //         }
-            //     );
-            // } else {
-            //     generateTypeScript(base, path, options).then(result.resolve, result.reject);
-            // }
         }
     }
     /// handleGenerate
