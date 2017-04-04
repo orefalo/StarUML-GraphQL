@@ -5,42 +5,36 @@ define(function(require, exports, module) {
         Core = app.getModule("core/Core"),
         PreferenceManager = app.getModule("core/PreferenceManager");
 
-    var preferenceId = "typescript";
+    var preferenceId = "graphql";
 
-    var typeScriptConfigure = {
+    var graphqlConfigure = {
 
-        "typescript.gen": {
-            text: "TypeScript Code Generation",
+        "graphql.gen.nodeserver": {
+            text: "Node Server Code Generation-TODO",
             type: "Section"
         },
 
-        "typescript.gen.tsDoc": {
-            text: "TypeScript Doc",
-            description: "Generate TypeScript Doc comments.",
+        "graphql.gen.gqDoc": {
+            text: "GraphQL comments",
+            description: "Generate GraphQL IDL comments.",
             type: "Check",
             default: true
         },
 
-        "typescript.gen.copyright": {
+        "graphql.gen.copyright": {
             text: "Copyright Text",
             description: "Copyright Text to use on all files",
             type: "String",
             default: "\n/*\n*(C) Copyright MyCompany, Inc. \n*All rights reserved\n*/\n"
         },
 
-        "typescript.gen.indentSpaces": {
+        "graphql.gen.indentSpaces": {
             text: "Indent Spaces",
             description: "Number of spaces for indentation.",
             type: "Number",
             default: 4
         },
 
-        "typescript.gen.comments": {
-            text: "Generate Comments",
-            description: "Generate comments in JSDoc style.",
-            type: "Check",
-            default: false
-        }
 
     };
 
@@ -50,15 +44,14 @@ define(function(require, exports, module) {
 
     function getGenOptions() {
         return {
-            tsDoc: PreferenceManager.get("typescript.gen.tsDoc"),
-            indentSpaces: PreferenceManager.get("typescript.gen.indentSpaces"),
-            copyright: PreferenceManager.get("typescript.gen.copyright"),
-            comments: PreferenceManager.get("typescript.gen.comments")
+            gqDoc: PreferenceManager.get("graphql.gen.gqDoc"),
+            indentSpaces: PreferenceManager.get("graphql.gen.indentSpaces"),
+            copyright: PreferenceManager.get("graphql.gen.copyright")
         };
     }
 
     AppInit.htmlReady(function() {
-        PreferenceManager.register(preferenceId, "TypeScript", typeScriptConfigure);
+        PreferenceManager.register(preferenceId, "GraphQL", graphqlConfigure);
     });
 
     exports.getId = getId;

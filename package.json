@@ -1,15 +1,15 @@
 {
-    "name": "yeoupooh.staruml-typescript",
-    "title": "TypeScript",
-    "version": "0.1.0",
-    "description": "TypeScript code generation",
-    "homepage": "https://github.com/yeoupooh/staruml-typescript",
-    "issues": "https://github.com/yeoupooh/staruml-typescript/issues",
-    "keywords": ["TypeScript", "ts", "UML", "staruml"],
+    "name": "orefalo.staruml-graphql",
+    "title": "GraphQL",
+    "version": "1.0.0",
+    "description": "GraphQL IDL schema generation for StarUML",
+    "homepage": "https://github.com/orefalo/StarUML-GraphQL",
+    "issues": "https://github.com/orefalo/StarUML-GraphQL/issues",
+    "keywords": ["GraphQL", "graphqls", "UML", "staruml"],
     "author": {
-        "name": "Thomas Min",
-        "email": "thomas.min.2012@gmail.com",
-        "url": "https://github.com/yeoupooh"
+        "name": "Olivier Refalo",
+        "email": "orefalo@yahoo.com",
+        "url": "https://github.com/orefalo"
     },
     "license": "GPLv3",
     "engines": {
