@@ -33,7 +33,7 @@ Let's start with the basics.
 So let's start with a basic class generation.
 Here class attributes are given a type and a default value. We also made v3 a required field. Finally we added documentation here and there to demo what the generator does.
 
-![](images/defaultValue__defaultValue_3.svg)
+![](images/defaultValue__defaultValue_3.png)
 
 ```
 # name: GraphQL Generation Samples
@@ -51,7 +51,7 @@ type MyClass {
 }
 ```
 
-![](images/directives__directives_9.svg)
+![](images/directives__directives_9.png)
 
 GraphQL offers a great way to implement custom behaviors using @directives. Using StarUML than can be modelled as Tags (if they need to be visually visible) or constraints. In the sample below, @const1 is not "visible"
 
@@ -67,7 +67,7 @@ type DirectiveClass {
 
 Scalars and Enumerations are supported by StarUML's native _Primitive_ and _Enumeration_ types. Please ensure you use these native StarUML types in order to generate the expected artifacts.
 
-![](images/scalars_enums__scalars_enums_4.svg)
+![](images/scalars_enums__scalars_enums_4.png)
 
 ```
 scalar UUID
@@ -85,7 +85,7 @@ enum Enumeration1 {
 
 Union types are defined by using _Dependencies_. Typically Unions do not carry any attributes or relations. The generator will warn when it enconters such structure.
 
-![](images/unions__unions_5.svg)
+![](images/unions__unions_5.png)
 
 ```
 type Cat {
@@ -108,7 +108,7 @@ union AnimalUnionType = Cat | Dog
 
 ###Associations, Aggregation & Composition
 
-![](images/associations__associations_1.svg)
+![](images/associations__associations_1.png)
 
 ```
 type Class3 {
@@ -139,7 +139,7 @@ type Class5 {
 }
 ```
 
-![](images/class_composition__composition_8.svg)
+![](images/class_composition__composition_8.png)
 
 ```
 type Team {
@@ -172,7 +172,7 @@ type Component {
 
 Unlike GraphQL syntax, there is no need to repeat the attribute definition across the hierachy. The generator takes care of it, Neat!
 
-![](images/class_hierarchy__class_hierarchy_0.svg)
+![](images/class_hierarchy__class_hierarchy_0.png)
 
 ```
 type Vehicule {
@@ -215,7 +215,7 @@ type Bike extends PassengerVehicule {
 
 ```
 
-![](images/interface_impl__interface_impl_6.svg)
+![](images/interface_impl__interface_impl_6.png)
 
 Here we use InterfaceRealization to implement an interface in a new class.
 
@@ -244,7 +244,7 @@ interface Goo {
 }
 ```
 
-![](images/InterfaceInherit__interfaceInheritance_2.svg)
+![](images/InterfaceInherit__interfaceInheritance_2.png)
 
 Finally a example showing interface extension.
 
@@ -285,7 +285,7 @@ interface I2 extends I1 {
 
 ###Schemas, Mutations
 
-![](images/schema_query_mutation_subscriptions__schema_and_more_7.svg)
+![](images/schema_query_mutation_subscriptions__schema_and_more_7.png)
 
 ```
 type RootMutation {
