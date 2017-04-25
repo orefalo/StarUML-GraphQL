@@ -108,6 +108,12 @@ union AnimalUnionType = Cat | Dog
 
 ###Associations, Aggregation & Composition
 
+Important facts, associations are:
+
+* directional
+* multiplicity aware
+* automatically named, unless specified (either on each end, or on association itself)
+
 ![](images/associations__associations_1.png)
 
 ```
@@ -168,7 +174,7 @@ type Component {
 }
 ```
 
-###Class and Interface hierachies
+###Class and Interface hierarchies
 
 Unlike GraphQL syntax, there is no need to repeat the attribute definition across the hierachy. The generator takes care of it, Neat!
 
@@ -393,7 +399,7 @@ The following rules apply during generation.
 ### UMLAssociationEnd
 
 * support for associations, aggregations and compositions
-* be careful, by default starUML create bu-directional associations(like) relations. Use the "navigable" flag to pick on which class(es) the accessor should be generated.
+* be careful, by default starUML create bi-directional associations(like) relations. Use the "navigable" flag to pick on which class(es) the accessor should be generated.
 
 ### UMLAssociationEnd
 
@@ -433,7 +439,6 @@ That StartUML default interface rendering. Right click on the interface, from th
 1. Select the attribute, the parameter or the relationship
 2. Use multiplicity "1" or "1..*" or a number
 
-
 Contributing
 ----
 * Clone this repo somewhere on your dsk
@@ -447,8 +452,13 @@ To Do
 ----
 
 * Find a better way to name the generated file.
+* Better handle the different ways to generate attributes - For instance, when attribute has a type and the class has a relationship of the same name. Also with inheritance.
 * Do not popup package location - pick from current selection.
 * Add a new Menu item that generates in a popup.
+
+Done
+----
+* unnamed associations use pluralized class names when applicable
 
 About the Author
 ----
