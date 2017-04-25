@@ -454,11 +454,12 @@ To Do
 * Find a better way to name the generated file.
 * Do not popup package location - pick from current selection.
 * Add a new Menu item that generates in a popup.
+* Add/remove graphql-faker directives with a menu entry
 
 Done
 ----
-* unnamed associations use pluralized class names when applicable
-* naming overrides are now properly implemented between attribute types , associations and hierarchies
+* Unnamed associations are given a more meaningful name based on the entities they link. They are also pluralized when applicable
+* Naming overrides are now properly implemented between attribute types , associations and hierarchies
 
 About the Author
 ----
