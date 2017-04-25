@@ -452,13 +452,13 @@ To Do
 ----
 
 * Find a better way to name the generated file.
-* Better handle the different ways to generate attributes - For instance, when attribute has a type and the class has a relationship of the same name. Also with inheritance.
 * Do not popup package location - pick from current selection.
 * Add a new Menu item that generates in a popup.
 
 Done
 ----
 * unnamed associations use pluralized class names when applicable
+* naming overrides are now properly implemented between attribute types , associations and hierarchies
 
 About the Author
 ----

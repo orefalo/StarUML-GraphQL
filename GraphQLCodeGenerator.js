@@ -217,8 +217,26 @@ define(function (require, exports, module) {
         codeWriter.writeLine();
         codeWriter.indent();
 
+        // holds {attrName:String -> attrValue:String}
+        // doc is modeled as attrName.doc
+        var attrDefs = {};
+
         // Member Variables
-        this.recurWriteInterfaceAttributes(codeWriter, elem, options);
+        this.recurWriteInterfaceAttributes2(attrDefs, elem, options);
+
+
+        // render attrDef to codeWriter
+        for (var attr in attrDefs) {
+
+            // ignore comments which are coming a "attrname.doc"
+            if (attr.indexOf(".") <= 0) {
+                var doc = attrDefs[attr + ".doc"];
+                if (doc)
+                    this.writeDoc(codeWriter, doc, options);
+
+                codeWriter.writeLine(attr + attrDefs[attr]);
+            }
+        }
 
         // Methods
         for (i = 0, len = elem.operations.length; i < len; i++) {
@@ -280,13 +298,29 @@ define(function (require, exports, module) {
         codeWriter.writeLine();
         codeWriter.indent();
 
-        // recursive class attributes
-        this.recurWriteClassAttributes(codeWriter, elem, options);
+        // holds {attrName:String -> attrValue:String}
+        // doc is modeled as attrName.doc
+        var attrDefs = {};
 
         // recursive interface attributes
         for (i = 0, len = _implements.length; i < len; i++) {
-            var e = _implements[i];
-            this.recurWriteInterfaceAttributes(codeWriter, e, options);
+            this.recurWriteInterfaceAttributes2(attrDefs, _implements[i], options);
+        }
+
+        // recursive class attributes
+        this.recurWriteClassAttributes2(attrDefs, elem, options);
+
+        // render attrDef to codeWriter
+        for (var attr in attrDefs) {
+
+            // ignore comments which are coming a "attrname.doc"
+            if (attr.indexOf(".") <= 0) {
+                var doc = attrDefs[attr + ".doc"];
+                if (doc)
+                    this.writeDoc(codeWriter, doc, options);
+
+                codeWriter.writeLine(attr + attrDefs[attr]);
+            }
         }
 
         // mutators
@@ -299,15 +333,19 @@ define(function (require, exports, module) {
         codeWriter.writeLine("}");
     };
 
-    GraphQLCodeGenerator.prototype.recurWriteInterfaceAttributes = function (codeWriter, elem, options) {
+    GraphQLCodeGenerator.prototype.recurWriteInterfaceAttributes2 = function (attrDefs, elem, options) {
 
         var i, len;
 
+        // from parent interfaces
+        var _extends = this.getSuperClasses(elem);
+        for (i = 0, len = _extends.length; i < len; i++)
+            this.recurWriteClassAttributes2(attrDefs, _extends[i], options);
+
         // Member Variables
         // (from attributes)
-        for (i = 0, len = elem.attributes.length; i < len; i++) {
-            this.writeAttribute(codeWriter, elem.attributes[i], options);
-        }
+        for (i = 0, len = elem.attributes.length; i < len; i++)
+            this.writeAttribute2(attrDefs, elem.attributes[i], options);
 
         // (from associations)
         var associations = Repository.getRelationshipsOf(elem, function (rel) {
@@ -315,34 +353,26 @@ define(function (require, exports, module) {
         });
         for (i = 0, len = associations.length; i < len; i++) {
             var asso = associations[i];
-            if (asso.end2.reference === elem && asso.end1.navigable === true) {
-                this.writeAttribute(codeWriter, asso.end1, options);
-            }
-            if (asso.end1.reference === elem && asso.end2.navigable === true) {
-                this.writeAttribute(codeWriter, asso.end2, options);
-            }
-        }
+            if (asso.end2.reference === elem && asso.end1.navigable === true)
+                this.writeAttribute2(attrDefs, asso.end1, options);
 
-        var _implements = this.getSuperInterfaces(elem);
-        if (_implements.length > 0) {
-            this.writeDoc(codeWriter, "WARNING: Interfaces must EXTEND other interfaces, ignoring InterfaceRealization.", options);
-        }
+            if (asso.end1.reference === elem && asso.end2.navigable === true)
+                this.writeAttribute2(attrDefs, asso.end2, options);
 
-        // from parent interfaces
-        var _extends = this.getSuperClasses(elem);
-        for (i = 0, len = _extends.length; i < len; i++) {
-            var e = _extends[i];
-            this.recurWriteClassAttributes(codeWriter, e, options);
         }
-
     };
 
-    GraphQLCodeGenerator.prototype.recurWriteClassAttributes = function (codeWriter, elem, options) {
+    GraphQLCodeGenerator.prototype.recurWriteClassAttributes2 = function (attrDefs, elem, options) {
         var i, len;
+
+        var _extends = this.getSuperClasses(elem);
+        if (_extends.length > 0) {
+            this.recurWriteClassAttributes2(attrDefs, _extends[0], options);
+        }
 
         // attributes
         for (i = 0, len = elem.attributes.length; i < len; i++) {
-            this.writeAttribute(codeWriter, elem.attributes[i], options);
+            this.writeAttribute2(attrDefs, elem.attributes[i], options);
         }
 
         // (from associations)
@@ -355,16 +385,11 @@ define(function (require, exports, module) {
 
             var asso = associations[i];
             if (asso.end2.reference === elem && asso.end1.navigable === true) {
-                this.writeAttribute(codeWriter, asso.end1, options);
+                this.writeAttribute2(attrDefs, asso.end1, options);
             }
             if (asso.end1.reference === elem && asso.end2.navigable === true) {
-                this.writeAttribute(codeWriter, asso.end2, options);
+                this.writeAttribute2(attrDefs, asso.end2, options);
             }
-        }
-
-        var _extends = this.getSuperClasses(elem);
-        if (_extends.length > 0) {
-            this.recurWriteClassAttributes(codeWriter, _extends[0], options);
         }
     };
 
@@ -531,8 +556,7 @@ define(function (require, exports, module) {
      * @param {type.Model} elem
      * @param {Object} options
      */
-
-    GraphQLCodeGenerator.prototype.writeAttribute = function (codeWriter, elem, options) {
+    GraphQLCodeGenerator.prototype.writeAttribute2 = function (attrDefs, elem, options) {
 
         var i, len;
 
@@ -565,10 +589,11 @@ define(function (require, exports, module) {
         if (name.length > 0) {
             var terms = [];
             // doc
-            this.writeDoc(codeWriter, elem.documentation, options);
+            //this.writeDoc(attrDefs, elem.documentation, options);
+            attrDefs[name + ".doc"] = elem.documentation;
 
             // name
-            terms.push(name);
+            //terms.push(name);
             terms.push(": ");
 
             // type
@@ -597,8 +622,7 @@ define(function (require, exports, module) {
                         terms.push(" @" + e.name + "(" + e.specification + ")");
                 }
             }
-
-            codeWriter.writeLine(terms.join(""));
+            attrDefs[name] = terms.join("");
         }
     };
 
