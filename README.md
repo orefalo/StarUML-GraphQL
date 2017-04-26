@@ -5,6 +5,21 @@ GraphQL Extension for StarUML 2
 
 This extension for StarUML(http://staruml.io) supports the generation of GraphQL IDL schemas from UML models. 
 
+What's new
+----
+* **New Feature:** Give great flexibility to your diagram but using Abstract classes. Abstract classes keept their full meaning in a class hierachy, but are not generated.
+* **New Feature:** Allow graphQL generation in a ui panel
+* **New Feature:** You may now generate from the top project level
+* **New Feature:** Added graphql file generation from context menu (right click on element)
+* **New Feature:** Generated filename is now based from the picked element
+* **New Feature:** Added a preference to control debug output
+* **New Feature:** Unnamed associations are given a more meaningful name based on the entities they link. They are also pluralized when applicable
+* **New Feature:** Attribute/Realtionship naming overrides are now properly implemented between attribute types , associations and hierarchies
+* **Bug:** Default parameter value wasn't generated for mutators
+* **Bug:** Removed _(c)copyright_ from preferences as this information is redundant with Project.copyright
+* **Bug:** Cardinality generation was off
+* **Extra:** Added a few more examples
+
 Installation
 ------------
 Install this extension from StarUML's Extension Manager.
@@ -20,7 +35,7 @@ Usage
 Generation
 ----------
 
-**Disclaimer:** Neither StarUML nor this generator can enforce the limitations governed by the GraphQL expression language. It is of your responsability to create data structures that will comply with the GraphQL specifications.
+**Disclaimer:** Neither StarUML nor this generator can enforce the limitations governed by the GraphQL expression language. It is of your responsibility to create data structures that will comply with the GraphQL specifications.
 
 ###GraphQL IDL Notation
 
@@ -83,7 +98,7 @@ enum Enumeration1 {
 
 ###Union types
 
-Union types are defined by using _Dependencies_. Typically Unions do not carry any attributes or relations. The generator will warn when it enconters such structure.
+Union types are defined by using _Dependencies_. Typically Unions do not carry any attributes or relations. The generator will warn when it encounters such structure.
 
 ![](images/unions__unions_5.png)
 
@@ -176,7 +191,7 @@ type Component {
 
 ###Class and Interface hierarchies
 
-Unlike GraphQL syntax, there is no need to repeat the attribute definition across the hierachy. The generator takes care of it, Neat!
+Unlike GraphQL syntax, there is no need to repeat the attribute definition across the hierarchy. The generator takes care of it, Neat!
 
 ![](images/class_hierarchy__class_hierarchy_0.png)
 
@@ -223,7 +238,7 @@ type Bike extends PassengerVehicule {
 
 ![](images/interface_impl__interface_impl_6.png)
 
-Here we use InterfaceRealization to implement an interface in a new class.
+Here we use InterfaceRealization to implement an interface in a new class. Note how the child attributes are automatically inherited from the parent interface.
 
 ```
 type Bar implements Foo {
@@ -343,11 +358,11 @@ The following rules apply during generation.
 
 ### Project Metadata
 
-* _name_, _company_, _version_, _author_ and _copyright_ are used to generate the document header
+* _name_, _company_, _version_, _author_ and _copyright_ are used to generate the document header.
 
 ### UMLPackage
 
-* ignored - but browsed recursively for other uml entities
+* ignored - but browsed recursively for other uml entities.
 
 ### UMLPrimaryType
 
@@ -356,6 +371,7 @@ The following rules apply during generation.
 ### UMLClass
 
 * converted to _GraphQL type_.
+* Abstract class are not generated, but still part of the hierarchy.
 * `union` stereotype converted to an *union* type, using dependency connections to related types.
 * `input` stereotype converted to an *input* type.
 * `schema` stereotype converted to a GraphQL *schema*.
@@ -370,7 +386,7 @@ The following rules apply during generation.
 * `multiplicity` property to array type and/or required constraint.
 * GraphQL directives implemented via attribute's Tag(name, value) 
 * GraphQL directives can also be modeled via an attribute Constraint(name, specification) - in which case they will not display in the diagram
-* Default values generation
+* Default values generation.
 * Documentation property to GraphQL comment.
 
 ### UMLOperation
@@ -399,15 +415,20 @@ The following rules apply during generation.
 ### UMLAssociationEnd
 
 * support for associations, aggregations and compositions
-* be careful, by default starUML create bi-directional associations(like) relations. Use the "navigable" flag to pick on which class(es) the accessor should be generated.
-
-### UMLAssociationEnd
-
+* be careful, by default starUML create bi-directional associations(like) relations. Use the "navigable" flag to pick on which side the accessor should be generated.
 * converted to _GraphQL Field_.
 * `name` property to field identifier.
 * `type` property to field type.
-* `multiplicity` property to array type and required constraint.
 * Documentation property to GraphQL comment.
+* `multiplicity` property to array type and required constraint.
+
+| Cardinality property| => Generation |
+| ------------------- |--------------|
+|       0..1          |        field |
+|       1             |       field! |
+|       n   n>1       |     [field!] |
+|       0..* or *     |      [field] |
+|       1..*          |     [field!] |
 
 ### UMLGeneralization
 
@@ -437,10 +458,18 @@ That StartUML default interface rendering. Right click on the interface, from th
 
 ### How to make an attribute _required_?
 1. Select the attribute, the parameter or the relationship
-2. Use multiplicity "1" or "1..*" or a number
+2. Depending on what you want to make 'required', use one of the multiplicity below
+
+| Cardinality property| => Generation |
+| ------------------- |--------------|
+|       1             |       field! |
+|       n   n>1       |     [field!] |
+|       1..*          |     [field!] |
+
 
 Contributing
 ----
+
 * Clone this repo somewhere on your dsk
 * Create a branch and switch to it
 * Go to `StarUML.app/Contents/www/extensions/dev`
@@ -451,15 +480,8 @@ Contributing
 To Do
 ----
 
-* Find a better way to name the generated file.
-* Do not popup package location - pick from current selection.
-* Add a new Menu item that generates in a popup.
-* Add/remove graphql-faker directives with a menu entry
+* Add/remove graphql-faker directives with a context-menu entry
 
-Done
-----
-* Unnamed associations are given a more meaningful name based on the entities they link. They are also pluralized when applicable
-* Naming overrides are now properly implemented between attribute types , associations and hierarchies
 
 About the Author
 ----

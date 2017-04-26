@@ -21,6 +21,8 @@
  *
  */
 
+/*global define, $, _, window, app, type, document */
+
 define(function (require, exports, module) {
     "use strict";
 

@@ -21,14 +21,10 @@ define(function (require, exports, module) {
      * @param {type.UMLPackage} baseModel
      * @param {string} basePath generated files and directories to be placed
      */
-    function GraphQLCodeGenerator(baseModel, basePath) {
+    function GraphQLCodeGenerator(baseModel) {
 
         /** @member {type.Model} */
         this.baseModel = baseModel;
-
-        /** @member {string} */
-        this.basePath = basePath;
-
     }
 
     /**
@@ -59,7 +55,9 @@ define(function (require, exports, module) {
         var result = new $.Deferred();
 
         var codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-        console.log('generate', 'elem', elem);
+
+        if (options.debug)
+            console.log('generate', 'elem', elem);
 
         // Doc
         var doc = "\n";
@@ -83,73 +81,72 @@ define(function (require, exports, module) {
 
         this.recurGenerate(codeWriter, elem, options);
 
-        var file = FileSystem.getFileForPath(path + "/schema.gql");
+        if (options.debug)
+            console.log("Saving to " + path);
+
+        var file = FileSystem.getFileForPath(path);
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
 
         return result.promise();
-
     };
-
 
     GraphQLCodeGenerator.prototype.recurGenerate = function (codeWriter, elem, options) {
 
-        var result = new $.Deferred(), self = this;
+        var self = this, oe;
 
         // Package
-        if (elem instanceof type.UMLPackage) {
-            Async.doSequentially(
-                elem.ownedElements,
-                function (child) {
-                    console.log('package generate');
-                    return self.recurGenerate(codeWriter, child, options);
-                },
-                false
-            ).then(result.resolve, result.reject);
+
+        if (elem instanceof type.UMLPackage || elem instanceof type.Project) {
+
+            oe = elem.ownedElements;
+            if (oe) {
+                for (var i = 0, len = oe.length; i < len; i++) {
+                    var e = oe[i];
+                    self.recurGenerate(codeWriter, e, options);
+                }
+            }
 
         } else if (elem instanceof type.UMLClass) {
-            // Class
-            console.log('Class generate ' + elem.name);
 
-            if (this.isUnion(elem))
-                this.writeUnion(codeWriter, elem, options);
-            else if (this.isInput(elem))
-                this.writeClass(codeWriter, elem, options, "input " + elem.name);
-            else if (this.isSchema(elem))
-                this.writeClass(codeWriter, elem, options, "schema");
-            else
-                this.writeClass(codeWriter, elem, options);
+            if (elem.isAbstract === false) {
+                // Class
+                if (options.debug)
+                    console.log('Class generate ' + elem.name);
 
-            codeWriter.writeLine();
-            result.resolve();
+                if (this.isUnion(elem))
+                    this.writeUnion(codeWriter, elem, options);
+                else if (this.isInput(elem))
+                    this.writeClass(codeWriter, elem, options, "input " + elem.name);
+                else if (this.isSchema(elem))
+                    this.writeClass(codeWriter, elem, options, "schema");
+                else
+                    this.writeClass(codeWriter, elem, options);
 
+                codeWriter.writeLine();
+            }
         } else if (elem instanceof type.UMLPrimitiveType) {
             // Scalar
-            console.log('Scalar generate' + elem.name);
+            if (options.debug)
+                console.log('Scalar generate' + elem.name);
             this.writeScalar(codeWriter, elem, options);
             codeWriter.writeLine();
-            result.resolve();
-
         } else if (elem instanceof type.UMLInterface) {
             // Interface
-            console.log('Interface generate' + elem.name);
+            if (options.debug)
+                console.log('Interface generate' + elem.name);
             this.writeInterface(codeWriter, elem, options);
             codeWriter.writeLine();
-            result.resolve();
-
         } else if (elem instanceof type.UMLEnumeration) {
             // Enum
-            console.log('Enumeration generate' + elem.name);
+            if (options.debug)
+                console.log('Enumeration generate' + elem.name);
             this.writeEnum(codeWriter, elem, options);
             codeWriter.writeLine();
-            result.resolve();
-
         } else {
             // Others (Nothing generated.)
-            console.log('nothing generate ' + elem);
-            result.resolve();
+            if (options.debug)
+                console.log('nothing generate ' + elem);
         }
-
-        return result.promise();
 
     };
 
@@ -276,8 +273,10 @@ define(function (require, exports, module) {
             if (_extends.length > 1)
                 this.writeDoc(codeWriter, "WARNING: you can only extend one class, ignoring others", options);
 
-            // can graphQL support more than one parent?
-            terms.push("extends " + _extends[0].name);
+            if (_extends[0].isAbstract === false) {
+                // can graphQL support more than one parent?
+                terms.push("extends " + _extends[0].name);
+            }
         }
 
         // Implements
@@ -380,7 +379,8 @@ define(function (require, exports, module) {
             return (rel instanceof type.UMLAssociation);
         });
 
-        console.log('association length: ' + associations.length);
+        if (options.debug)
+            console.log('association length: ' + associations.length);
         for (i = 0, len = associations.length; i < len; i++) {
 
             var asso = associations[i];
@@ -427,12 +427,12 @@ define(function (require, exports, module) {
             return (rel instanceof type.UMLDependency);
         });
 
-        console.log('dependencies length: ' + dependencies.length);
+        if (options.debug)
+            console.log('dependencies length: ' + dependencies.length);
 
         if (dependencies.length > 0) {
             // Doc
             this.writeDoc(codeWriter, elem.documentation, options);
-
 
             for (i = 0, len = dependencies.length; i < len; i++) {
                 terms.push(dependencies[i].target.name);
@@ -476,6 +476,12 @@ define(function (require, exports, module) {
             for (i = 0, len = params.length; i < len; i++) {
                 var p = params[i];
                 var s = p.name + ": " + this.getType(p);
+
+                // initial value
+                if (p.defaultValue && p.defaultValue.length > 0) {
+                    s = s + "=" + p.defaultValue;
+                }
+
                 paramTerms.push(s);
             }
 
@@ -483,7 +489,7 @@ define(function (require, exports, module) {
 
             // return type
             if (returnParam) {
-                terms.push(": ");
+                terms.push(":");
                 terms.push(this.getType(returnParam));
             }
 
@@ -531,19 +537,36 @@ define(function (require, exports, module) {
         }
 
         // multiplicity
+
+        // | Cardinality property| => Generation |
+        // | ------------------- |--------------|
+        // |       0..1          |        field |
+        // |       1             |       field! |
+        // |       n   n>1       |     [field!] |
+        // |       0..* or *     |      [field] |
+        // |       1..*          |     [field!] |
+
         if (elem.multiplicity) {
-            if (_.contains(["1"], elem.multiplicity.trim())) {
+            var m = elem.multiplicity.trim();
+            if (_.contains(["0..1"], m)) {
+                _type = _type;
+            }
+            else if (_.contains(["1"], m)) {
                 _type = _type + "!";
-            } else if (_.contains(["0..*"], elem.multiplicity.trim())) {
-                _type = "[" + _type + "]";
-            } else if (_.contains(["1..*", "*"], elem.multiplicity.trim())) {
-                _type = "[" + _type + "]!";
             }
-            else if (elem.multiplicity.match(/^\d+$/)) {
+            else if (m.match(/^\d+$/)) {
                 // number
+                _type = "[" + _type + "!]";
+            }
+            else if (_.contains(["0..*", "*"], m)) {
                 _type = "[" + _type + "]";
             }
-            // 0..1 don't change anything
+            else if (_.contains(["1..*"], m)) {
+                _type = "[" + _type + "!]";
+            }
+            else {
+                console.log("WARNING: We have a problem Houston: unknown cardinality" + _type);
+            }
         }
 
         return _type;
@@ -560,8 +583,9 @@ define(function (require, exports, module) {
 
         var i, len;
 
-        // console.log('writeAttribute', 'elem', elem, elem._parent instanceof type.UMLInterface);
-        console.log('writeAttribute', 'elem', elem);
+
+        if (options.debug)
+            console.log('writeAttribute', 'elem', elem);
 
         var name = elem.name;
 
@@ -645,15 +669,15 @@ define(function (require, exports, module) {
     };
 
     GraphQLCodeGenerator.prototype.isUnion = function (elem) {
-        return (elem.stereotype !== undefined && elem.stereotype === "union")
+        return (elem.stereotype === "union")
     };
 
     GraphQLCodeGenerator.prototype.isInput = function (elem) {
-        return (elem.stereotype !== undefined && elem.stereotype === "input")
+        return (elem.stereotype === "input")
     };
 
     GraphQLCodeGenerator.prototype.isSchema = function (elem) {
-        return (elem.stereotype !== undefined && elem.stereotype === "schema")
+        return (elem.stereotype === "schema")
     };
 
 
@@ -786,9 +810,7 @@ define(function (require, exports, module) {
 
         // check for matches using regular expressions
         for (var reg in array) {
-
             var pattern = new RegExp(reg, 'i');
-
             if (pattern.test(this))
                 return str.replace(pattern, array[reg]);
         }
@@ -803,11 +825,26 @@ define(function (require, exports, module) {
      * @param {Object} options
      */
     function generate(baseModel, basePath, options) {
-        var result = new $.Deferred();
-        var codeGenerator = new GraphQLCodeGenerator(baseModel, basePath);
+        var codeGenerator = new GraphQLCodeGenerator(baseModel);
         return codeGenerator.generate(baseModel, basePath, options);
     }
 
-    exports.generate = generate;
+    function generateString(elem, options) {
 
+        var codeGenerator = new GraphQLCodeGenerator(elem);
+        if (options.debug) {
+            console.log("generateString " + elem);
+            console.log("options " + options);
+        }
+        var codeWriter = new CodeGenUtils.CodeWriter(codeGenerator.getIndentString(options));
+        if (options.debug)
+            console.log("codeWriter " + codeWriter);
+        codeGenerator.recurGenerate(codeWriter, elem, options);
+        if (options.debug)
+            console.log("recurGenerate " + codeWriter);
+        return codeWriter.getData();
+    }
+
+    exports.generate = generate;
+    exports.generateString = generateString;
 });

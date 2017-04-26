@@ -1,3 +1,6 @@
+
+/*global define, $, _, window, app, type, document */
+
 define(function(require, exports, module) {
     "use strict";
 
@@ -10,7 +13,7 @@ define(function(require, exports, module) {
     var graphqlConfigure = {
 
         "graphql.gen.nodeserver": {
-            text: "Node Server Code Generation-TODO",
+            text: "GraphQL generator settings",
             type: "Section"
         },
 
@@ -21,13 +24,6 @@ define(function(require, exports, module) {
             default: true
         },
 
-        "graphql.gen.copyright": {
-            text: "Copyright Text",
-            description: "Copyright Text to use on all files",
-            type: "String",
-            default: "\n/*\n*(C) Copyright MyCompany, Inc. \n*All rights reserved\n*/\n"
-        },
-
         "graphql.gen.indentSpaces": {
             text: "Indent Spaces",
             description: "Number of spaces for indentation.",
@@ -35,7 +31,12 @@ define(function(require, exports, module) {
             default: 4
         },
 
-
+        "graphql.gen.debug": {
+            text: "Debug on console",
+            description: "Output debug information on Console",
+            type: "Check",
+            default: false
+        },
     };
 
     function getId() {
@@ -46,7 +47,7 @@ define(function(require, exports, module) {
         return {
             gqDoc: PreferenceManager.get("graphql.gen.gqDoc"),
             indentSpaces: PreferenceManager.get("graphql.gen.indentSpaces"),
-            copyright: PreferenceManager.get("graphql.gen.copyright")
+            debug: PreferenceManager.get("graphql.gen.debug")
         };
     }
 
