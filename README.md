@@ -37,7 +37,7 @@ Generation
 
 **Disclaimer:** Neither StarUML nor this generator can enforce the limitations governed by the GraphQL expression language. It is of your responsibility to create data structures that will comply with the GraphQL specifications.
 
-###GraphQL IDL Notation
+### GraphQL IDL Notation
 
 Let's start with the basics.
 
@@ -78,7 +78,7 @@ type DirectiveClass {
 ```
 
 
-###Scalars & Enums
+### Scalars & Enums
 
 Scalars and Enumerations are supported by StarUML's native _Primitive_ and _Enumeration_ types. Please ensure you use these native StarUML types in order to generate the expected artifacts.
 
@@ -96,7 +96,7 @@ enum Enumeration1 {
 ```
 
 
-###Union types
+### Union types
 
 Union types are defined by using _Dependencies_. Typically Unions do not carry any attributes or relations. The generator will warn when it encounters such structure.
 
@@ -121,7 +121,7 @@ union AnimalUnionType = Cat | Dog
 # WARNING: Attributes on union types is not GraphQL compliant, ignoring.
 ```
 
-###Associations, Aggregation & Composition
+### Associations, Aggregation & Composition
 
 Important facts, associations are:
 
@@ -189,7 +189,7 @@ type Component {
 }
 ```
 
-###Class and Interface hierarchies
+### Class and Interface hierarchies
 
 Unlike GraphQL syntax, there is no need to repeat the attribute definition across the hierarchy. The generator takes care of it, Neat!
 
