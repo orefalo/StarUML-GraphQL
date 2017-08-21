@@ -43,7 +43,7 @@ Let's start with the basics.
 
 ![](images/GraphqLCheatSheet.png)
 
-###Classes, Default values & Directives
+### Classes, Default values & Directives
 
 So let's start with a basic class generation.
 Here class attributes are given a type and a default value. We also made v3 a required field. Finally we added documentation here and there to demo what the generator does.
@@ -304,7 +304,7 @@ interface I2 extends I1 {
 ```
 
 
-###Schemas, Mutations
+### Schemas, Mutations
 
 ![](images/schema_query_mutation_subscriptions__schema_and_more_7.png)
 
