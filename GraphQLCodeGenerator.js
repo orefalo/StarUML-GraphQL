@@ -267,7 +267,15 @@ define(function (require, exports, module) {
         }
 
         // Extends
-        var _extends = this.getSuperClasses(elem);
+        // look for the 1st parent class that is not abstract
+        var _extends;
+        var e=elem;
+        do {
+            _extends = this.getSuperClasses(e);
+            if (_extends.length > 0)
+                e = _extends[0];
+        } while (_extends.length > 0 && _extends[0].isAbstract === true);
+            
         if (_extends.length > 0) {
 
             if (_extends.length > 1)
